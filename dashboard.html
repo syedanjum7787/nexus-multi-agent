@@ -269,7 +269,7 @@
             <div class="form-card-header"><span class="form-card-icon">📅</span><span class="form-card-title">Schedule Event</span></div>
             <div class="form-grid">
               <div class="form-group span-full"><label class="form-label">Event Title *</label><input type="text" id="event-title" class="form-input" placeholder="e.g. Team standup"/></div>
-              <div class="form-group"><label class="form-label">Start Time *</label><input type="datetime-local" id="event-start" class="form-input"/></div>
+              <div class="form-group"><label class="form-label">Start Time *</label><input type="datetime-local" id="event-start" class="form-input" onchange="const e=document.getElementById('event-end');if(!e.value){const d=new Date(this.value);d.setHours(d.getHours()+1);e.value=d.toISOString().slice(0,16)}"/></div>
               <div class="form-group"><label class="form-label">End Time *</label><input type="datetime-local" id="event-end" class="form-input"/></div>
               <div class="form-group"><label class="form-label">Location</label><input type="text" id="event-location" class="form-input" placeholder="Optional"/></div>
               <div class="form-group"><label class="form-label">Description</label><input type="text" id="event-desc" class="form-input" placeholder="Optional"/></div>
@@ -568,6 +568,13 @@ async function createTask() {
 }
 
 async function createEvent() {
+  // Auto-fill end time if empty
+  const startVal = document.getElementById("event-start").value;
+  const endEl = document.getElementById("event-end");
+  if (startVal && !endEl.value) {
+    const d = new Date(startVal); d.setHours(d.getHours()+1);
+    endEl.value = d.toISOString().slice(0,16);
+  }
   const title = document.getElementById('event-title').value.trim();
   const start = document.getElementById('event-start').value;
   const end = document.getElementById('event-end').value;
