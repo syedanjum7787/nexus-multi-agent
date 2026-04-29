@@ -107,6 +107,13 @@ def serve_png(filename: str):
         return FileResponse(filepath, media_type="image/png")
     raise HTTPException(404, "File not found")
 
+@app.get("/assets/sounds/{filename}")
+def serve_sound(filename: str):
+    filepath = os.path.join(STATIC_DIR, "assets", "sounds", filename)
+    if os.path.isfile(filepath):
+        return FileResponse(filepath)
+    raise HTTPException(404, "File not found")
+
 
 # ── API Routes ──
 @app.get("/health")
