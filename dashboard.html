@@ -274,7 +274,7 @@
               <div class="form-group"><label class="form-label">Location</label><input type="text" id="event-location" class="form-input" placeholder="Optional"/></div>
               <div class="form-group"><label class="form-label">Description</label><input type="text" id="event-desc" class="form-input" placeholder="Optional"/></div>
             </div>
-            <div class="form-actions"><button class="form-submit teal" onclick="createEvent()"><span id="event-btn-label">Schedule Event</span></button><span class="form-feedback" id="event-feedback"></span></div>
+            <div class="form-actions"><button class="form-submit teal" onclick="scheduleNewEvent()"><span id="event-btn-label">Schedule Event</span></button><span class="form-feedback" id="event-feedback"></span></div>
           </div>
         </div>
         <div class="data-section">
@@ -460,7 +460,7 @@ _detectAPI().then(() => {
     // Show AI status warning if no API key
     if (!_aiReady) {
       const area = document.getElementById('result-area');
-      if (area) area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 AI Not Configured</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">The Orchestrate feature needs a Gemini API key.<br><br><b>To enable AI orchestration:</b><br>1. Get a free API key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--teal)">aistudio.google.com/apikey</a><br>2. Run: <code>export GEMINI_API_KEY=your_key</code><br>3. Restart: <code>python3 main.py</code><br><br><span style="color:var(--teal)">✓ Tasks, Calendar, Notes &amp; MCP Tools work without AI.</span></div></div>';
+      if (area) area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 AI Not Configured</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">The Orchestrate feature needs a GROQ_API_KEY.<br><br><b>To enable AI orchestration:</b><br>1. Get a free API key at <a href="https://console.groq.com" target="_blank" style="color:var(--teal)">console.groq.com</a><br>2. Run: <code>export GEMINI_API_KEY=your_key</code><br>3. Restart: <code>python3 main.py</code><br><br><span style="color:var(--teal)">✓ Tasks, Calendar, Notes &amp; MCP Tools work without AI.</span></div></div>';
     }
   }
 });
@@ -512,7 +512,7 @@ async function runQuery() {
     return;
   }
   if (!_aiReady) {
-    area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 AI Not Configured</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">The Orchestrate feature needs a Gemini API key to process natural language queries.<br><br><b>Quick setup:</b><br>1. Get a free key → <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--teal)">aistudio.google.com/apikey</a><br>2. <code>export GEMINI_API_KEY=your_key_here</code><br>3. Restart: <code>python3 main.py</code><br><br><span style="color:var(--teal)">✓ Meanwhile, use the Tasks, Calendar, and Notes tabs directly — they work without AI!</span></div></div>';
+    area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 AI Not Configured</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">The Orchestrate feature needs a GROQ_API_KEY to process natural language queries.<br><br><b>Quick setup:</b><br>1. Get a free key → <a href="https://console.groq.com" target="_blank" style="color:var(--teal)">console.groq.com</a><br>2. <code>export GROQ_API_KEY=your_key_here</code><br>3. Restart: <code>python3 main.py</code><br><br><span style="color:var(--teal)">✓ Meanwhile, use the Tasks, Calendar, and Notes tabs directly — they work without AI!</span></div></div>';
     if (typeof nekoReact === 'function') nekoReact('error');
     return;
   }
@@ -526,7 +526,7 @@ async function runQuery() {
     if (!res.ok) {
       const detail = data.detail || '';
       if (detail.includes('GEMINI_API_KEY')) {
-        area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 API Key Required</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">Set your Gemini API key:<br><code>export GEMINI_API_KEY=your_key && python3 main.py</code><br><br>Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--teal)">aistudio.google.com/apikey</a></div></div>';
+        area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 API Key Required</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">Set your Gemini API key:<br><code>export GEMINI_API_KEY=your_key && python3 main.py</code><br><br>Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--teal)">console.groq.com</a></div></div>';
         if (typeof nekoReact === 'function') nekoReact('error');
         btn.disabled = false; label.textContent = 'Run';
         return;
@@ -567,7 +567,7 @@ async function createTask() {
   document.getElementById('task-btn-label').textContent = 'Create Task';
 }
 
-async function createEvent() {
+async function scheduleNewEvent() {
   // Auto-fill end time if empty
   const startVal = document.getElementById("event-start").value;
   const endEl = document.getElementById("event-end");
