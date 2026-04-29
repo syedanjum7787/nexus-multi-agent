@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="NEXUS — Pixel Cat Productivity Assistant. Manage tasks, schedules, and notes with your interactive pixel cat companion."/>
+<title>NEXUS — Pixel Cat Productivity</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Press+Start+2P&family=VT323&family=Silkscreen:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- ══════ LOGIN SCREEN ══════ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-stars" id="login-stars"></div>
+  <div class="login-card">
+    <div class="login-cat-wrap">
+      <div class="login-cat-frame">
+        <img src="neko_idle.png" class="login-cat" id="login-cat-img" alt="Neko" onclick="loginCatBounce()"/>
+      </div>
+      <div class="login-cat-bubble" id="login-cat-bubble">Mew~ Welcome!</div>
+    </div>
+    <div class="login-title">NEXUS</div>
+    <div class="login-subtitle" id="login-mode-label">SIGN IN TO CONTINUE</div>
+    <div class="login-form" id="login-form">
+      <div class="login-input-wrap">
+        <label class="login-input-label">USERNAME</label>
+        <input type="text" class="login-input" id="login-username" placeholder="Enter username..." autocomplete="off"/>
+      </div>
+      <div class="login-input-wrap">
+        <label class="login-input-label">PASSWORD</label>
+        <input type="password" class="login-input" id="login-password" placeholder="Enter password..."/>
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <button class="login-btn" id="login-btn" onclick="handleLogin()">SIGN IN 🐾</button>
+      <div class="login-toggle" id="login-toggle">New here? <span onclick="toggleLoginMode()">Create Account</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PIXEL BOOT SEQUENCE ══════ -->
+<div class="boot-screen" id="welcome-screen" style="display:none;">
+  <div class="boot-bg-image"></div>
+  <div class="boot-bg-overlay"></div>
+  <div class="boot-content" id="boot-content">
+    <div class="boot-cat-visual" id="boot-cat">🐱</div>
+    <h1 class="boot-title" id="boot-title">NEXUS</h1>
+    <p class="boot-subtitle" id="boot-subtitle">YOUR PIXEL CAT PRODUCTIVITY COMPANION</p>
+    <div class="boot-terminal" id="boot-terminal">
+      <div class="term-line" data-delay="0">[ SYSTEM ] Waking up Neko...</div>
+      <div class="term-line" data-delay="400">[ GEMINI ] AI core linked — purring ready</div>
+      <div class="term-line agent-line" data-delay="800"><span class="term-dot green"></span> Orchestrator .............. ONLINE</div>
+      <div class="term-line agent-line" data-delay="1200"><span class="term-dot amber"></span> TaskAgent ................. ONLINE</div>
+      <div class="term-line agent-line" data-delay="1600"><span class="term-dot teal"></span> CalendarAgent ............. ONLINE</div>
+      <div class="term-line agent-line" data-delay="2000"><span class="term-dot rust"></span> NotesAgent ................ ONLINE</div>
+      <div class="term-line" data-delay="2400">[ MCP ] 14 tools registered 🐾</div>
+      <div class="term-line" data-delay="2800">[ READY ] All systems purring ✓</div>
+    </div>
+    <div class="boot-progress-wrap" id="boot-progress-wrap">
+      <div class="boot-progress-bar" id="boot-progress-bar"></div>
+    </div>
+    <div class="boot-quote" id="boot-quote"></div>
+    <button class="boot-enter-btn" id="boot-enter" onclick="dismissWelcome()">
+      <span>ENTER NEXUS</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- ══════ FLOATING NEKO DESKTOP PET ══════ -->
+<div id="neko-pet" class="neko-floating-pet">
+  <div class="neko-pixel-bubble" id="neko-pixel-bubble"></div>
+  <div class="neko-pet-canvas" id="neko-pet-canvas"></div>
+</div>
+
+<div class="layout" id="main-layout" style="display:none;">
+
+  <!-- ══════ Sidebar ══════ -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-paw">🐾</div>
+      <div>
+        <div class="logo-mark">NEXUS</div>
+        <div class="logo-sub">NEKO_TASK v2.0</div>
+      </div>
+    </div>
+    <div class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">
+      <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+      <div class="theme-toggle-track"><div class="theme-toggle-thumb"></div></div>
+      <span class="theme-toggle-label" id="theme-label">DARK MODE</span>
+    </div>
+    <nav>
+      <div class="nav-item active" onclick="setTab('query')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Orchestrate
+      </div>
+      <div class="nav-item" onclick="setTab('tasks')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M5 7l2 2 4-3"/></svg>
+        Tasks
+      </div>
+      <div class="nav-item" onclick="setTab('calendar')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M2 7h12M5 2v2M11 2v2"/></svg>
+        Calendar
+      </div>
+      <div class="nav-item" onclick="setTab('notes')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h7l3 3v9H3z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>
+        Notes
+      </div>
+      <div class="nav-item" onclick="setTab('logs')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h5"/></svg>
+        Workflow Logs
+      </div>
+      <div class="nav-item" onclick="setTab('warroom')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h12v12H2z"/><path d="M2 8h12M8 2v12"/></svg>
+        War Room
+      </div>
+      <div class="nav-item" onclick="setTab('mcp')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/></svg>
+        MCP Tools
+      </div>
+    </nav>
+
+    <!-- Neko Status HUD (split bar) -->
+    <div class="neko-status-hud" id="neko-hud">
+      <div class="hud-icon">🐱</div>
+      <div class="hud-bars">
+        <div class="hud-split-labels">
+          <span class="hud-split-label-left">HAPPY</span>
+          <span class="hud-split-label-right">FOOD</span>
+        </div>
+        <div class="hud-split-bar-container">
+          <div class="hud-split-half left">
+            <div class="hud-split-fill happy" id="hud-happy-fill" style="width:100%"></div>
+          </div>
+          <div class="hud-split-divider"></div>
+          <div class="hud-split-half right">
+            <div class="hud-split-fill food" id="hud-food-fill" style="width:100%"></div>
+          </div>
+        </div>
+        <div class="hud-split-pcts">
+          <span class="hud-bar-pct" id="hud-happy-pct">100%</span>
+          <span class="hud-bar-pct" id="hud-food-pct">100%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cat Tower Home -->
+    <div id="cat-tower-home" onclick="callNekoHome()" title="Click to call Neko home">
+      <div id="tower-mood-dot" class="mood-ok"></div>
+      <div class="tower-sprite-wrap">
+        <canvas id="tower-canvas" width="50" height="82"></canvas>
+      </div>
+      <div class="tower-label">
+        <span class="tower-home-text">NEKO'S HOME</span>
+        <div class="tower-cycle-btns">
+          <button class="tower-cycle-btn" onclick="event.stopPropagation();cycleTower(-1)" title="Previous style">◀</button>
+          <button class="tower-cycle-btn" onclick="event.stopPropagation();cycleTower(1)" title="Next style">▶</button>
+        </div>
+      </div>
+    </div>
+    <button class="neko-sleep-btn" id="neko-sleep-btn" onclick="nekoSleepAction()" title="Put Neko to sleep & start focus timer">💤 SLEEP</button>
+    <!-- Pomodoro Timer (hidden until sleep) -->
+    <div class="pomodoro-container" id="pomodoro-container" style="display:none;">
+      <div class="pomodoro-label">FOCUS SESSION</div>
+      <div class="pomodoro-timer" id="pomodoro-timer">25:00</div>
+      <div class="pomodoro-btns">
+        <button class="pomodoro-btn" id="pomodoro-pause-btn" onclick="pausePomodoro()">⏸ PAUSE</button>
+        <button class="pomodoro-btn stop" id="pomodoro-stop-btn" onclick="stopPomodoro()">⏹ STOP</button>
+      </div>
+    </div>
+    <button class="cat-settings-btn" onclick="openCatSettings()" title="Cat Settings">🐱⚙️ CAT SETTINGS</button>
+
+    <div class="sidebar-bottom">
+      <div class="agent-status">AGENTS ONLINE</div>
+      <div class="agent-pill"><div class="dot"></div>Orchestrator</div>
+      <div class="agent-pill"><div class="dot" style="background:var(--amber)"></div>TaskAgent</div>
+      <div class="agent-pill"><div class="dot" style="background:var(--teal)"></div>CalendarAgent</div>
+      <div class="agent-pill"><div class="dot" style="background:var(--coral)"></div>NotesAgent</div>
+      <div class="system-status"><span class="status-dot-live"></span> SYSTEM STATUS: PURRING</div>
+      <!-- Sound + Tour moved to Cat Settings panel -->
+    </div>
+    <div class="sidebar-scroll-hint" id="sidebar-scroll-hint">
+      <span>↓ scroll ↓</span>
+    </div>
+  </aside>
+
+  <!-- ══════ Main ══════ -->
+  <main class="main">
+    <div class="header">
+      <div>
+        <div class="page-title" id="page-title">Orchestrate</div>
+        <div class="page-sub" id="page-sub">Natural language → multi-agent workflow</div>
+      </div>
+      <div class="header-right">
+        <button class="focus-mode-pill" id="header-focus-btn" onclick="nekoSleepAction()" title="Start Focus Mode">🌙 FOCUS MODE</button>
+        <button class="cmd-k-pill" onclick="toggleCommandPalette()" title="Ask Neko (⌘K)">🐾 Ask Neko <span class="cmd-k-badge">⌘K</span></button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="tab-query" onclick="setTab('query')">Orchestrate</div>
+      <div class="tab" id="tab-tasks" onclick="setTab('tasks')">Tasks</div>
+      <div class="tab" id="tab-calendar" onclick="setTab('calendar')">Calendar</div>
+      <div class="tab" id="tab-notes" onclick="setTab('notes')">Notes</div>
+      <div class="tab" id="tab-logs" onclick="setTab('logs')">Logs</div>
+      <div class="tab" id="tab-warroom" onclick="setTab('warroom')">War Room</div>
+      <div class="tab" id="tab-mcp" onclick="setTab('mcp')">MCP Tools</div>
+    </div>
+
+    <div class="content">
+
+      <!-- ══════ QUERY / ORCHESTRATE PANEL ══════ -->
+      <div class="panel active" id="panel-query">
+        <div class="stats-row">
+          <div class="stat-card purple"><div class="stat-label">Total Tasks</div><div class="stat-value" id="stat-tasks">–</div></div>
+          <div class="stat-card teal"><div class="stat-label">Events</div><div class="stat-value" id="stat-events">–</div></div>
+          <div class="stat-card coral"><div class="stat-label">Notes</div><div class="stat-value" id="stat-notes">–</div></div>
+        </div>
+        <div class="impact-bar" id="impact-bar">⚡ NEXUS has saved you approximately <span class="impact-num" id="impact-hrs">0</span> hrs this week by automating <span class="impact-num" id="impact-actions">0</span> actions across <span class="impact-num" id="impact-agents">0</span> agents</div>
+        <div class="query-section">
+          <div class="query-label">🐾 Natural Language Query</div>
+          <div class="query-input-row">
+            <textarea id="query-input" placeholder="Tell Neko what you need..."></textarea>
+            <button class="mic-btn" id="mic-btn" onclick="toggleVoiceInput()" title="Voice Input">✨🔮<span class="mic-timer" id="mic-timer">60s</span></button>
+            <button class="mic-stop-btn" id="mic-stop-btn" onclick="stopRecording()">■ STOP</button>
+            <button class="send-btn" id="send-btn" onclick="runQuery()">
+              <span id="send-label">Run</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="examples">
+            <span class="example-chip" onclick="fillExample(this)">Create a task to review slides by Monday</span>
+            <span class="example-chip" onclick="fillExample(this)">Schedule a 1-hour team meeting tomorrow at 10am</span>
+            <span class="example-chip" onclick="fillExample(this)">Save a note: Project kickoff agenda items</span>
+            <span class="example-chip" onclick="fillExample(this)">Show all my pending tasks</span>
+          </div>
+        </div>
+        <div id="result-area"></div>
+      </div>
+
+      <!-- ══════ TASKS PANEL ══════ -->
+      <div class="panel" id="panel-tasks">
+        <div class="form-card">
+          <div class="form-card-header"><span class="form-card-icon">✅</span><span class="form-card-title">Create New Task</span></div>
+          <div class="form-grid">
+            <div class="form-group span-2"><label class="form-label">Task Title *</label><input type="text" id="task-title" class="form-input" placeholder="e.g. Review Q3 report"/></div>
+            <div class="form-group"><label class="form-label">Priority</label><select id="task-priority" class="form-select"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div>
+            <div class="form-group"><label class="form-label">Due Date</label><input type="date" id="task-due" class="form-input"/></div>
+            <div class="form-group span-full"><label class="form-label">Description</label><input type="text" id="task-desc" class="form-input" placeholder="Optional description..."/></div>
+          </div>
+          <div class="form-actions"><button class="form-submit" onclick="createTask()"><span id="task-btn-label">Create Task</span></button><span class="form-feedback" id="task-feedback"></span></div>
+        </div>
+        <div class="data-section">
+          <div class="section-head"><div class="section-title">All Tasks</div><button class="refresh-btn" onclick="loadTasks()">↻ Refresh</button></div>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Title</th><th>Priority</th><th>Status</th><th>Due Date</th><th>Description</th><th>Actions</th></tr></thead><tbody id="tasks-body"><tr><td colspan="7"><div class="empty">No tasks yet — create one above!</div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ══════ CALENDAR PANEL ══════ -->
+      <div class="panel" id="panel-calendar">
+        <div class="calendar-layout">
+          <div class="calendar-grid-wrap">
+            <div class="calendar-nav"><button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button><span class="cal-month-label" id="cal-month-label"></span><button class="cal-nav-btn" onclick="changeMonth(1)">›</button></div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+          <div class="form-card">
+            <div class="form-card-header"><span class="form-card-icon">📅</span><span class="form-card-title">Schedule Event</span></div>
+            <div class="form-grid">
+              <div class="form-group span-full"><label class="form-label">Event Title *</label><input type="text" id="event-title" class="form-input" placeholder="e.g. Team standup"/></div>
+              <div class="form-group"><label class="form-label">Start Time *</label><input type="datetime-local" id="event-start" class="form-input"/></div>
+              <div class="form-group"><label class="form-label">End Time *</label><input type="datetime-local" id="event-end" class="form-input"/></div>
+              <div class="form-group"><label class="form-label">Location</label><input type="text" id="event-location" class="form-input" placeholder="Optional"/></div>
+              <div class="form-group"><label class="form-label">Description</label><input type="text" id="event-desc" class="form-input" placeholder="Optional"/></div>
+            </div>
+            <div class="form-actions"><button class="form-submit teal" onclick="createEvent()"><span id="event-btn-label">Schedule Event</span></button><span class="form-feedback" id="event-feedback"></span></div>
+          </div>
+        </div>
+        <div class="data-section">
+          <div class="section-head"><div class="section-title">Scheduled Events</div><button class="refresh-btn" onclick="loadEvents()">↻ Refresh</button></div>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Title</th><th>Start</th><th>End</th><th>Location</th><th>Description</th><th>Action</th></tr></thead><tbody id="events-body"><tr><td colspan="7"><div class="empty">No events — schedule one above!</div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ══════ NOTES PANEL ══════ -->
+      <div class="panel" id="panel-notes">
+        <div class="form-card">
+          <div class="form-card-header"><span class="form-card-icon">📝</span><span class="form-card-title">Save a Note</span></div>
+          <div class="form-grid">
+            <div class="form-group span-2"><label class="form-label">Note Title *</label><input type="text" id="note-title" class="form-input" placeholder="e.g. Meeting agenda"/></div>
+            <div class="form-group"><label class="form-label">Tags (comma separated)</label><input type="text" id="note-tags" class="form-input" placeholder="e.g. work, urgent"/></div>
+            <div class="form-group span-full"><label class="form-label">Content *</label><textarea id="note-content" class="form-textarea" rows="4" placeholder="Write your note here..."></textarea></div>
+          </div>
+          <div class="form-actions"><button class="form-submit coral" onclick="createNote()"><span id="note-btn-label">Save Note</span></button><span class="form-feedback" id="note-feedback"></span></div>
+        </div>
+        <div class="data-section">
+          <div class="section-head"><div class="section-title">Saved Notes</div><button class="refresh-btn" onclick="loadNotes()">↻ Refresh</button></div>
+          <div id="notes-cards" class="notes-grid"></div>
+        </div>
+      </div>
+
+      <!-- ══════ LOGS PANEL ══════ -->
+      <div class="panel" id="panel-logs">
+        <div class="section-head"><div class="section-title">Workflow Execution Log</div><button class="refresh-btn" onclick="loadLogs()">↻ Refresh</button></div>
+        <div class="table-wrap" id="logs-container"><div class="empty">No workflow activity yet.</div></div>
+      </div>
+
+      <!-- ══════ WAR ROOM PANEL ══════ -->
+      <div class="panel" id="panel-warroom">
+        <div class="warroom-header">
+          <div class="section-title">⚡ Agent War Room</div>
+          <div class="warroom-counter">MISSIONS COMPLETED: <span id="warroom-missions">0</span></div>
+        </div>
+        <div class="warroom-grid" id="warroom-grid">
+          <div class="agent-war-card" id="awr-orchestrator">
+            <div class="awr-name" style="color:var(--accent2)">🧠 Orchestrator</div>
+            <div class="awr-status idle" id="awr-status-orchestrator">IDLE</div>
+            <div class="awr-meta"><b>Last:</b> <span id="awr-last-orchestrator">—</span><br><b>Tokens:</b> <span id="awr-tokens-orchestrator">0</span> · <b>Time:</b> <span id="awr-time-orchestrator">—</span></div>
+          </div>
+          <div class="agent-war-card" id="awr-task">
+            <div class="awr-name" style="color:var(--amber)">📋 TaskAgent</div>
+            <div class="awr-status idle" id="awr-status-task">IDLE</div>
+            <div class="awr-meta"><b>Last:</b> <span id="awr-last-task">—</span><br><b>Tokens:</b> <span id="awr-tokens-task">0</span> · <b>Time:</b> <span id="awr-time-task">—</span></div>
+          </div>
+          <div class="agent-war-card" id="awr-calendar">
+            <div class="awr-name" style="color:var(--teal)">📅 CalendarAgent</div>
+            <div class="awr-status idle" id="awr-status-calendar">IDLE</div>
+            <div class="awr-meta"><b>Last:</b> <span id="awr-last-calendar">—</span><br><b>Tokens:</b> <span id="awr-tokens-calendar">0</span> · <b>Time:</b> <span id="awr-time-calendar">—</span></div>
+          </div>
+          <div class="agent-war-card" id="awr-notes">
+            <div class="awr-name" style="color:var(--coral)">📝 NotesAgent</div>
+            <div class="awr-status idle" id="awr-status-notes">IDLE</div>
+            <div class="awr-meta"><b>Last:</b> <span id="awr-last-notes">—</span><br><b>Tokens:</b> <span id="awr-tokens-notes">0</span> · <b>Time:</b> <span id="awr-time-notes">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ MCP TOOLS PANEL ══════ -->
+      <div class="panel" id="panel-mcp">
+        <div class="stats-row">
+          <div class="stat-card purple"><div class="stat-label">Total Tools</div><div class="stat-value" id="stat-tools">14</div></div>
+          <div class="stat-card teal"><div class="stat-label">Agents</div><div class="stat-value" id="stat-agents">3</div></div>
+          <div class="stat-card coral"><div class="stat-label">Protocol</div><div class="stat-value" style="font-size:20px">MCP</div></div>
+        </div>
+        <div class="data-section">
+          <div class="section-head"><div class="section-title">Registered MCP Tools</div><button class="refresh-btn" onclick="loadMCPTools()">↻ Refresh</button></div>
+          <div id="mcp-tools-list" class="mcp-tools-grid"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ══════ Inventory Button + Panel ══════ -->
+<button class="inventory-toggle" id="inventory-toggle" onclick="toggleInventory()" title="Open Cat Inventory">🗃️<span class="inventory-badge">!</span></button>
+<div class="inventory-panel" id="inventory-panel">
+  <div class="inventory-title">🐱 Cat Inventory</div>
+  <div class="inventory-subtitle">drag food to cat or tap to use!</div>
+  <div class="inventory-grid">
+    <div class="inventory-item" data-item="fish" onclick="useItem('fish')"><span class="inventory-item-emoji">🐟</span><span class="inventory-item-name">Fish</span></div>
+    <div class="inventory-item" data-item="treats" onclick="useItem('treats')"><span class="inventory-item-emoji">🍪</span><span class="inventory-item-name">Treats</span></div>
+    <div class="inventory-item" data-item="milk" onclick="useItem('milk')"><span class="inventory-item-emoji">🥛</span><span class="inventory-item-name">Milk</span></div>
+    <div class="inventory-item" data-item="bed" onclick="useItem('bed')"><span class="inventory-item-emoji">🛏️</span><span class="inventory-item-name">Bed</span></div>
+    <div class="inventory-item" data-item="brush" onclick="useItem('brush')"><span class="inventory-item-emoji">✨</span><span class="inventory-item-name">Brush</span></div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="delete-modal" style="display:none;">
+  <div class="modal-card">
+    <div class="modal-header"><span class="modal-icon">⚠️</span><span class="modal-title">Confirm Delete</span></div>
+    <div class="modal-body" id="delete-modal-body">Are you sure?</div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="modal-btn danger" id="delete-confirm-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ Cat Settings Panel ══════ -->
+<div class="cat-settings-overlay" id="cat-settings-overlay" style="display:none;" onclick="if(event.target===this)closeCatSettings()">
+  <div class="cat-settings-card">
+    <div class="cat-settings-header">
+      <span class="cat-settings-title">🐱 CAT SETTINGS</span>
+      <button class="cat-settings-close" onclick="closeCatSettings()">✕</button>
+    </div>
+    <div class="cat-settings-body">
+      <!-- Inventory section removed (Fix 3) -->
+      <!-- Sound -->
+      <div class="cat-settings-section">
+        <div class="cat-settings-label"><span class="cs-icon">🔊</span> SOUND</div>
+        <div class="cat-vol-row">
+          <button class="cat-vol-mute" id="cs-mute-btn" onclick="csMuteToggle()" title="Toggle Mute">🔊</button>
+          <div class="cat-vol-slider" id="cs-vol-slider" onclick="csVolClick(event)">
+            <div class="cat-vol-fill" id="cs-vol-fill" style="width:60%"></div>
+          </div>
+          <span class="cat-vol-pct" id="cs-vol-pct">60%</span>
+        </div>
+      </div>
+      <!-- Replay Tour -->
+      <div class="cat-settings-section">
+        <div class="cat-settings-label"><span class="cs-icon">🎬</span> ONBOARDING</div>
+        <button class="cat-replay-btn" onclick="closeCatSettings();setTimeout(()=>startNekoTour(),300)">🐾 REPLAY TOUR</button>
+      </div>
+      <!-- Mood History -->
+      <div class="cat-settings-section">
+        <div class="cat-settings-label"><span class="cs-icon">🐾</span> CAT MOOD HISTORY</div>
+        <div class="cat-mood-log" id="cat-mood-log">
+          <div class="cat-mood-empty">No events yet — feed Neko!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="cat-engine.js"></script>
+<script src="neko.js"></script>
+<script>
+// Auto-detect API endpoint
+let API = '';
+let _backendOnline = false;
+let _aiReady = false;
+
+async function _detectAPI() {
+  const candidates = ['', 'http://localhost:8000'];
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url + '/health', { signal: AbortSignal.timeout(2000) });
+      if (res.ok) {
+        const data = await res.json();
+        API = url;
+        _backendOnline = true;
+        _aiReady = !!data.ai_ready;
+        console.log('[NEXUS] Backend connected:', url || '(same-origin)', '| AI:', _aiReady ? 'ready' : 'no key');
+        return;
+      }
+    } catch {}
+  }
+  _backendOnline = false;
+  console.warn('[NEXUS] No backend found. Start with: python3 main.py');
+}
+
+const _noAPI = () => !_backendOnline;
+
+// Run detection immediately and refresh data once connected
+_detectAPI().then(() => {
+  if (_backendOnline) {
+    loadStats();
+    const activePanel = document.querySelector('.panel.active');
+    if (activePanel) {
+      const id = activePanel.id.replace('panel-', '');
+      if (id === 'tasks') loadTasks();
+      if (id === 'calendar') { loadEvents(); renderCalendar(); }
+      if (id === 'notes') loadNotes();
+      if (id === 'logs') loadLogs();
+      if (id === 'mcp') loadMCPTools();
+    }
+    // Show AI status warning if no API key
+    if (!_aiReady) {
+      const area = document.getElementById('result-area');
+      if (area) area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 AI Not Configured</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">The Orchestrate feature needs a Gemini API key.<br><br><b>To enable AI orchestration:</b><br>1. Get a free API key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--teal)">aistudio.google.com/apikey</a><br>2. Run: <code>export GEMINI_API_KEY=your_key</code><br>3. Restart: <code>python3 main.py</code><br><br><span style="color:var(--teal)">✓ Tasks, Calendar, Notes &amp; MCP Tools work without AI.</span></div></div>';
+    }
+  }
+});
+
+const pageTitles = {
+  query: ['Orchestrate', 'Natural language → multi-agent workflow'],
+  tasks: ['Task Manager', 'Create & manage tasks with priorities'],
+  calendar: ['Calendar', 'Schedule events & plan your day'],
+  notes: ['Notes', 'Save ideas, meeting notes & more'],
+  logs: ['Workflow Logs', 'Agent execution history'],
+  warroom: ['War Room', 'Real-time agent activity & status'],
+  mcp: ['MCP Tools', 'Model Context Protocol — registered tools'],
+};
+
+function setTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    const t = n.textContent.trim().toLowerCase();
+    if (name === 'mcp' && t.includes('mcp')) n.classList.add('active');
+    else if (name === 'warroom' && t.includes('war')) n.classList.add('active');
+    else if (t.includes(name === 'query' ? 'orchest' : name)) n.classList.add('active');
+  });
+  const [title, sub] = pageTitles[name] || ['NEXUS', ''];
+  document.getElementById('page-title').textContent = title;
+  document.getElementById('page-sub').textContent = sub;
+  if (name === 'tasks') loadTasks();
+  if (name === 'calendar') { loadEvents(); renderCalendar(); }
+  if (name === 'notes') loadNotes();
+  if (name === 'logs') loadLogs();
+  if (name === 'mcp') loadMCPTools();
+  if (typeof updateWalleGuide === 'function') updateWalleGuide(name);
+}
+
+function fillExample(el) { document.getElementById('query-input').value = el.textContent.trim(); }
+
+async function runQuery() {
+  const query = document.getElementById('query-input').value.trim();
+  if (!query) return;
+  const btn = document.getElementById('send-btn');
+  const label = document.getElementById('send-label');
+  const area = document.getElementById('result-area');
+  if (_noAPI()) {
+    area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--coral)">⚠ No Backend</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">Start the API server:<br><br><code>python3 main.py</code><br><br>Then refresh this page.</div></div>';
+    if (typeof nekoReact === 'function') nekoReact('no-backend');
+    return;
+  }
+  if (!_aiReady) {
+    area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 AI Not Configured</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">The Orchestrate feature needs a Gemini API key to process natural language queries.<br><br><b>Quick setup:</b><br>1. Get a free key → <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--teal)">aistudio.google.com/apikey</a><br>2. <code>export GEMINI_API_KEY=your_key_here</code><br>3. Restart: <code>python3 main.py</code><br><br><span style="color:var(--teal)">✓ Meanwhile, use the Tasks, Calendar, and Notes tabs directly — they work without AI!</span></div></div>';
+    if (typeof nekoReact === 'function') nekoReact('error');
+    return;
+  }
+  btn.disabled = true; label.innerHTML = '<span class="spinner"></span>';
+  if (typeof nekoReact === 'function') nekoReact('query-start');
+  if (typeof animateWarRoom === 'function') animateWarRoom(query);
+  area.innerHTML = '';
+  try {
+    const res = await fetch(API + '/query', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query}) });
+    const data = await res.json();
+    if (!res.ok) {
+      const detail = data.detail || '';
+      if (detail.includes('GEMINI_API_KEY')) {
+        area.innerHTML = '<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--amber)">🔑 API Key Required</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">Set your Gemini API key:<br><code>export GEMINI_API_KEY=your_key && python3 main.py</code><br><br>Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--teal)">aistudio.google.com/apikey</a></div></div>';
+        if (typeof nekoReact === 'function') nekoReact('error');
+        btn.disabled = false; label.textContent = 'Run';
+        return;
+      }
+      throw new Error(detail || 'Server error');
+    }
+    renderResult(data, area); loadStats();
+    if (typeof nekoReact === 'function') nekoReact('query-done');
+    if (typeof completeWarRoom === 'function') completeWarRoom(data);
+    if (typeof incrementMissions === 'function') incrementMissions();
+    if (typeof speakResult === 'function') speakResult(data);
+  } catch (e) {
+    area.innerHTML = `<div class="result-box"><div class="result-header"><span class="result-title" style="color:var(--coral)">⚠ Error</span></div><div style="padding:14px 16px;font-family:var(--mono);font-size:14px;color:var(--muted)">${e.message || 'Could not reach API.'}</div></div>`;
+    if (typeof nekoReact === 'function') nekoReact('error');
+  }
+  btn.disabled = false; label.textContent = 'Run';
+}
+
+function renderResult(data, container) {
+  container.innerHTML = `<div class="result-box"><div class="result-header"><div class="result-title"><span style="color:var(--accent2)">✦</span> Workflow Complete — ${data.steps_executed||0} step(s)</div><div class="result-meta">session: ${data.session_id||'—'}</div></div>${data.plan_summary?`<div class="plan-banner">🐾 ${data.plan_summary}</div>`:''}<div class="workflow-steps">${(data.results||[]).map(r=>`<div class="step-card"><span class="step-agent-badge ${agentBadgeClass(r.agent)}">${r.agent}</span><div class="step-body"><div class="step-action">${r.action||''}</div><div class="step-message">${r.message||''}</div></div></div>`).join('')}</div><button class="explain-btn" onclick="explainWorkflow()">🔍 EXPLAIN THIS</button><div id="explain-area"></div></div>`;
+  window._lastQueryResult = data;
+}
+function agentBadgeClass(a){if(!a)return'badge-orchestrator';if(a.includes('Task'))return'badge-task';if(a.includes('Calendar'))return'badge-calendar';if(a.includes('Notes'))return'badge-notes';return'badge-orchestrator';}
+
+async function createTask() {
+  const title = document.getElementById('task-title').value.trim();
+  if (!title) { showFeedback('task-feedback','❌ Title required','coral'); return; }
+  if (_noAPI()) { showFeedback('task-feedback','❌ Start backend: python3 main.py','coral'); return; }
+  const body = { title, description: document.getElementById('task-desc').value.trim(), priority: document.getElementById('task-priority').value, due_date: document.getElementById('task-due').value };
+  document.getElementById('task-btn-label').innerHTML = '<span class="spinner"></span>';
+  try {
+    const res = await fetch(API+'/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data = await res.json();
+    showFeedback('task-feedback','✅ '+data.message,'green');
+    document.getElementById('task-title').value=''; document.getElementById('task-desc').value=''; document.getElementById('task-due').value='';
+    loadTasks(); loadStats(); if(typeof nekoReact==='function')nekoReact('task-created');
+  } catch(e) { showFeedback('task-feedback','❌ Server error','coral'); }
+  document.getElementById('task-btn-label').textContent = 'Create Task';
+}
+
+async function createEvent() {
+  const title = document.getElementById('event-title').value.trim();
+  const start = document.getElementById('event-start').value;
+  const end = document.getElementById('event-end').value;
+  if (!title||!start||!end) { showFeedback('event-feedback','❌ Title, start & end required','coral'); return; }
+  if (_noAPI()) { showFeedback('event-feedback','❌ Start backend: python3 main.py','coral'); return; }
+  const body = { title, start_time: start.replace('T',' '), end_time: end.replace('T',' '), location: document.getElementById('event-location').value.trim(), description: document.getElementById('event-desc').value.trim() };
+  document.getElementById('event-btn-label').innerHTML = '<span class="spinner"></span>';
+  try {
+    const res = await fetch(API+'/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data = await res.json();
+    showFeedback('event-feedback','✅ '+data.message,'green');
+    ['event-title','event-start','event-end','event-location','event-desc'].forEach(id=>document.getElementById(id).value='');
+    loadEvents(); loadStats(); renderCalendar(); if(typeof nekoReact==='function')nekoReact('event-created');
+  } catch(e) { showFeedback('event-feedback','❌ Server error','coral'); }
+  document.getElementById('event-btn-label').textContent = 'Schedule Event';
+}
+
+async function createNote() {
+  const title = document.getElementById('note-title').value.trim();
+  const content = document.getElementById('note-content').value.trim();
+  if (!title||!content) { showFeedback('note-feedback','❌ Title & content required','coral'); return; }
+  if (_noAPI()) { showFeedback('note-feedback','❌ Start backend: python3 main.py','coral'); return; }
+  const tagsRaw = document.getElementById('note-tags').value.trim();
+  const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [];
+  document.getElementById('note-btn-label').innerHTML = '<span class="spinner"></span>';
+  try {
+    const res = await fetch(API+'/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,content,tags})});
+    const data = await res.json();
+    showFeedback('note-feedback','✅ '+data.message,'green');
+    document.getElementById('note-title').value=''; document.getElementById('note-content').value=''; document.getElementById('note-tags').value='';
+    loadNotes(); loadStats(); if(typeof nekoReact==='function')nekoReact('note-saved');
+  } catch(e) { showFeedback('note-feedback','❌ Server error','coral'); }
+  document.getElementById('note-btn-label').textContent = 'Save Note';
+}
+
+async function toggleTaskStatus(id, s) {
+  if (_noAPI()) return;
+  try { await fetch(API+'/tasks/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s==='pending'?'completed':'pending'})}); loadTasks(); loadStats(); if(s==='pending'&&typeof nekoReact==='function')nekoReact('task-completed'); } catch{}
+}
+
+let pendingDelete = null;
+function confirmDelete(type, id, name) {
+  pendingDelete = {type,id};
+  document.getElementById('delete-modal-body').textContent = `Delete ${type} "${name||'#'+id}"? This can't be undone.`;
+  document.getElementById('delete-modal').style.display = 'flex';
+  document.getElementById('delete-confirm-btn').onclick = executeDelete;
+}
+function closeDeleteModal() { document.getElementById('delete-modal').style.display='none'; pendingDelete=null; }
+async function executeDelete() {
+  if(!pendingDelete)return; const{type,id}=pendingDelete; closeDeleteModal();
+  if (_noAPI()) return;
+  try{const ep=type==='task'?'tasks':type==='event'?'events':'notes';const r=await fetch(`${API}/${ep}/${id}`,{method:'DELETE'});if(r.ok){if(type==='task')loadTasks();if(type==='event'){loadEvents();renderCalendar();}if(type==='note')loadNotes();loadStats();}}catch{}
+}
+
+function showFeedback(id,msg,color){const el=document.getElementById(id);el.textContent=msg;el.style.color=`var(--${color})`;setTimeout(()=>el.textContent='',3500);}
+
+async function loadStats(){if(_noAPI()){document.getElementById('stat-tasks').textContent='0';document.getElementById('stat-events').textContent='0';document.getElementById('stat-notes').textContent='0';updateImpactBar(0,0,0);return;}try{const[t,e,n]=await Promise.all([fetch(API+'/tasks').then(r=>r.json()),fetch(API+'/events').then(r=>r.json()),fetch(API+'/notes').then(r=>r.json())]);const tc=(t.tasks||[]).length,ec=(e.events||[]).length,nc=(n.notes||[]).length;document.getElementById('stat-tasks').textContent=tc;document.getElementById('stat-events').textContent=ec;document.getElementById('stat-notes').textContent=nc;window._nekoTaskCache=t.tasks||[];window._nekoEventCache=e.events||[];if(typeof nekoUpdateProductivity==='function')nekoUpdateProductivity(t.tasks||[],e.events||[]);updateImpactBar(tc,ec,nc);}catch{}}
+
+async function loadTasks(){if(_noAPI()){document.getElementById('tasks-body').innerHTML='<tr><td colspan="7"><div class="empty">Start backend to see tasks</div></td></tr>';return;}try{const data=await fetch(API+'/tasks').then(r=>r.json());const tasks=data.tasks||[];window._nekoTaskCache=tasks;const tbody=document.getElementById('tasks-body');if(!tasks.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">No tasks yet!</div></td></tr>';return;}tbody.innerHTML=tasks.map(t=>`<tr data-task-id="${t.id}" data-task-title="${(t.title||'').replace(/"/g,'&quot;')}" data-task-status="${t.status}"><td style="color:var(--muted)">${t.id}</td><td style="font-weight:600">${t.title}</td><td class="priority-${t.priority}"><span class="priority-dot ${t.priority}"></span>${t.priority}</td><td><span class="status-badge ${t.status}">${t.status}</span></td><td style="color:var(--muted)">${t.due_date||'—'}</td><td style="color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description||'—'}</td><td><div class="action-btns"><button class="toggle-btn ${t.status}" onclick="toggleTaskStatus(${t.id},'${t.status}')">${t.status==='pending'?'✓ Done':'↩ Undo'}</button><button class="delete-btn" onclick="confirmDelete('task',${t.id},'${t.title.replace(/'/g,"\\'")}')">✕</button></div></td></tr>`).join('');}catch{document.getElementById('tasks-body').innerHTML='<tr><td colspan="7"><div class="empty">Could not load.</div></td></tr>';}}
+
+async function loadEvents(){if(_noAPI()){document.getElementById('events-body').innerHTML='<tr><td colspan="7"><div class="empty">Start backend to see events</div></td></tr>';return;}try{const data=await fetch(API+'/events').then(r=>r.json());const events=data.events||[];const tbody=document.getElementById('events-body');if(!events.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty">No events!</div></td></tr>';return;}tbody.innerHTML=events.map(e=>`<tr><td style="color:var(--muted)">${e.id}</td><td style="font-weight:600">${e.title}</td><td style="color:var(--teal)">${e.start_time}</td><td style="color:var(--teal)">${e.end_time}</td><td style="color:var(--muted)">${e.location||'—'}</td><td style="color:var(--muted)">${e.description||'—'}</td><td><button class="delete-btn" onclick="confirmDelete('event',${e.id},'${e.title.replace(/'/g,"\\'")}')">✕</button></td></tr>`).join('');}catch{document.getElementById('events-body').innerHTML='<tr><td colspan="7"><div class="empty">Could not load.</div></td></tr>';}}
+
+async function loadNotes(){if(_noAPI()){document.getElementById('notes-cards').innerHTML='<div class="empty">Start backend to see notes</div>';return;}try{const data=await fetch(API+'/notes').then(r=>r.json());const notes=data.notes||[];const c=document.getElementById('notes-cards');if(!notes.length){c.innerHTML='<div class="empty">No notes yet!</div>';return;}c.innerHTML=notes.map(n=>`<div class="note-card"><div class="note-card-header"><div class="note-card-title">${n.title}</div><button class="delete-btn small" onclick="confirmDelete('note',${n.id},'${n.title.replace(/'/g,"\\'")}')">✕</button></div><div class="note-card-content">${n.content}</div><div class="note-card-footer"><div class="note-card-tags">${(n.tags||[]).map(t=>`<span class="note-tag">${t}</span>`).join('')||'<span style="color:var(--muted)">no tags</span>'}</div><div class="note-card-date">${(n.created_at||'').substring(0,16)}</div></div></div>`).join('');}catch{document.getElementById('notes-cards').innerHTML='<div class="empty">Could not load.</div>';}}
+
+async function loadLogs(){const c=document.getElementById('logs-container');if(_noAPI()){c.innerHTML='<div class="empty">Start backend to see logs</div>';return;}try{const data=await fetch(API+'/logs').then(r=>r.json());const logs=data.logs||[];if(!logs.length){c.innerHTML='<div class="empty">No activity yet.</div>';return;}c.innerHTML=logs.map(l=>`<div class="log-entry"><div class="log-time">${(l.timestamp||'').substring(11,19)}</div><div class="log-body"><div class="log-agent" style="color:${agentColor(l.agent)}">${l.agent} → ${l.action}</div><div class="log-query">${l.user_query}</div></div></div>`).join('');}catch{c.innerHTML='<div class="empty">Could not load.</div>';}}
+
+async function loadMCPTools(){const c=document.getElementById('mcp-tools-list');if(_noAPI()){c.innerHTML='<div class="empty">Start backend to see MCP tools</div>';return;}try{const data=await fetch(API+'/mcp/tools').then(r=>r.json());const tools=data.tools||[];document.getElementById('stat-tools').textContent=tools.length;document.getElementById('stat-agents').textContent=[...new Set(tools.map(t=>t.agent))].length;c.innerHTML=tools.map(t=>{const params=t.parameters?.properties||{};const req=new Set(t.parameters?.required||[]);const pl=Object.entries(params).map(([k,v])=>`<span class="mcp-param${req.has(k)?' required':''}">${k}${req.has(k)?'*':''}</span>`).join('');return`<div class="mcp-tool-card"><div class="mcp-tool-header"><span class="step-agent-badge ${agentBadgeClass(t.agent)}">${t.agent}</span><span class="mcp-tool-name">${t.name}</span></div><div class="mcp-tool-desc">${t.description}</div><div class="mcp-tool-params">${pl||'<span style="color:var(--muted)">No params</span>'}</div></div>`;}).join('');}catch{c.innerHTML='<div class="empty">Could not load MCP tools.</div>';}}
+
+function agentColor(a){if(!a)return'var(--muted)';if(a.includes('Task'))return'var(--amber)';if(a.includes('Calendar'))return'var(--teal)';if(a.includes('Notes'))return'var(--coral)';return'var(--accent2)';}
+
+// Calendar
+let calYear, calMonth;
+(function(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();})();
+function changeMonth(d){calMonth+=d;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+
+async function renderCalendar(){const grid=document.getElementById('calendar-grid');const label=document.getElementById('cal-month-label');const months=['January','February','March','April','May','June','July','August','September','October','November','December'];label.textContent=`${months[calMonth]} ${calYear}`;let eventDates=[];if(!_noAPI()){try{const data=await fetch(API+'/events').then(r=>r.json());eventDates=(data.events||[]).map(e=>e.start_time?.substring(0,10));}catch{}}const firstDay=new Date(calYear,calMonth,1).getDay();const daysInMonth=new Date(calYear,calMonth+1,0).getDate();const today=new Date();const todayStr=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;let html='<div class="cal-header">Su</div><div class="cal-header">Mo</div><div class="cal-header">Tu</div><div class="cal-header">We</div><div class="cal-header">Th</div><div class="cal-header">Fr</div><div class="cal-header">Sa</div>';for(let i=0;i<firstDay;i++)html+='<div class="cal-day empty"></div>';for(let d=1;d<=daysInMonth;d++){const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;html+=`<div class="cal-day${ds===todayStr?' today':''}${eventDates.includes(ds)?' has-event':''}" onclick="selectCalDate('${ds}')">${d}</div>`;}grid.innerHTML=html;}
+
+function selectCalDate(ds){document.getElementById('event-start').value=ds+'T09:00';document.getElementById('event-end').value=ds+'T10:00';document.getElementById('event-title').focus();}
+
+// Neko Guide Toggle (no-op since sidebar neko is now compact HUD)
+function toggleNekoGuide() {}
+function updateScrollHint() {}
+document.querySelector('.sidebar')?.addEventListener('scroll', () => {});
+document.getElementById('query-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))runQuery();});
+
+loadStats();
+setTimeout(updateScrollHint, 500);
+
+// Boot handled by neko.js initBoot()
+
+function dismissWelcome(){const ws=document.getElementById('welcome-screen');const layout=document.getElementById('main-layout');if(!ws)return;ws.classList.add('fade-out');setTimeout(()=>{ws.style.display='none';layout.style.display='';layout.classList.add('layout-enter');},600);}
+
+// Live typing placeholder
+(function(){const ta=document.getElementById('query-input');if(!ta)return;const prompts=['Ask Neko to create a task for you, nya~...','Schedule a 2-hour meeting tomorrow...','Save a note with project ideas...','Create task, schedule meeting, and save notes...'];let pi=0,ci=0,del=false;function type(){if(ta===document.activeElement){setTimeout(type,500);return;}const p=prompts[pi];if(!del){if(ci<=p.length){ta.setAttribute('placeholder',p.slice(0,ci)+'|');ci++;setTimeout(type,40+Math.random()*30);}else{setTimeout(()=>{del=true;type();},2000);}}else{if(ci>0){ci--;ta.setAttribute('placeholder',prompts[pi].slice(0,ci)+'|');setTimeout(type,20);}else{del=false;pi=(pi+1)%prompts.length;setTimeout(type,400);}}}setTimeout(type,1500);})();
+</script>
+
+<!-- ══════ NEW FEATURES SCRIPT ══════ -->
+<button class="shortcuts-toggle" id="shortcuts-toggle" onclick="toggleShortcuts()" title="Keyboard Shortcuts">?</button>
+<div class="shortcuts-popup" id="shortcuts-popup">
+  <h4>⌨ SHORTCUTS</h4>
+  <div class="sc-row"><span>Command palette</span><span class="sc-key">⌘K</span></div>
+  <div class="sc-row"><span>Run query</span><span class="sc-key">⌃↵</span></div>
+  <div class="sc-row"><span>Tasks</span><span class="sc-key">⌃T</span></div>
+  <div class="sc-row"><span>Calendar</span><span class="sc-key">⌃E</span></div>
+  <div class="sc-row"><span>Notes</span><span class="sc-key">⌃N</span></div>
+  <div class="sc-row"><span>Logs</span><span class="sc-key">⌃L</span></div>
+  <div class="sc-row"><span>Close modal</span><span class="sc-key">Esc</span></div>
+</div>
+
+<script>
+// ══════ F1: VOICE INPUT + NEKO VOICE RESPONSE ══════
+let _speechRec = null;
+let _isRecording = false;
+
+(function initVoice() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) { const mb = document.getElementById('mic-btn'); if (mb) mb.style.display = 'none'; return; }
+  _speechRec = new SpeechRec();
+  _speechRec.continuous = false;
+  _speechRec.interimResults = false;
+  _speechRec.lang = 'en-US';
+  _speechRec.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('query-input').value = text;
+    stopRecording();
+    if (typeof showPixelBubble === 'function') showPixelBubble('Got it! "' + text.substring(0, 30) + '..."', 3000);
+  };
+  _speechRec.onerror = () => stopRecording();
+  _speechRec.onend = () => stopRecording();
+})();
+let _micTimerInterval = null;
+let _micTimeLeft = 60;
+
+function toggleVoiceInput() {
+  if (_isRecording) { stopRecording(); return; }
+  if (!_speechRec) return;
+  _isRecording = true;
+  const btn = document.getElementById('mic-btn');
+  const stopBtn = document.getElementById('mic-stop-btn');
+  const timerEl = document.getElementById('mic-timer');
+  if (btn) btn.classList.add('recording');
+  if (stopBtn) stopBtn.classList.add('active');
+  _micTimeLeft = 60;
+  if (timerEl) timerEl.textContent = '60s';
+  _micTimerInterval = setInterval(() => {
+    _micTimeLeft--;
+    if (timerEl) timerEl.textContent = _micTimeLeft + 's';
+    if (_micTimeLeft <= 0) stopRecording();
+  }, 1000);
+  _speechRec.start();
+  if (typeof showPixelBubble === 'function') showPixelBubble("I'm listening... ✨🔮", 5000);
+  if (typeof setCatState === 'function') setCatState('happy');
+}
+
+function stopRecording() {
+  _isRecording = false;
+  clearInterval(_micTimerInterval);
+  const btn = document.getElementById('mic-btn');
+  const stopBtn = document.getElementById('mic-stop-btn');
+  if (btn) btn.classList.remove('recording');
+  if (stopBtn) stopBtn.classList.remove('active');
+  try { _speechRec?.stop(); } catch {}
+}
+
+// ══════ CAT SETTINGS PANEL ══════
+function openCatSettings() {
+  document.getElementById('cat-settings-overlay').style.display = 'flex';
+  csUpdateVolumeUI();
+}
+function closeCatSettings() {
+  document.getElementById('cat-settings-overlay').style.display = 'none';
+}
+
+// Volume slider
+let _csVolume = 0.6;
+function csUpdateVolumeUI() {
+  const fill = document.getElementById('cs-vol-fill');
+  const pct = document.getElementById('cs-vol-pct');
+  const mBtn = document.getElementById('cs-mute-btn');
+  const vol = Math.round(_csVolume * 100);
+  if (fill) fill.style.width = vol + '%';
+  if (pct) pct.textContent = vol + '%';
+  if (mBtn) mBtn.textContent = _csVolume === 0 ? '🔇' : '🔊';
+}
+function csVolClick(e) {
+  const slider = document.getElementById('cs-vol-slider');
+  if (!slider) return;
+  const rect = slider.getBoundingClientRect();
+  _csVolume = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  csUpdateVolumeUI();
+  if (typeof SoundEngine !== 'undefined') {
+    SoundEngine.muted = false;
+    if (SoundEngine.sounds) Object.values(SoundEngine.sounds).forEach(s => { if (s && s.volume !== undefined) s.volume = _csVolume * 0.7; });
+  }
+}
+function csMuteToggle() {
+  if (typeof SoundEngine !== 'undefined' && SoundEngine.toggleMute) {
+    SoundEngine.toggleMute();
+    _csVolume = SoundEngine.muted ? 0 : 0.6;
+    csUpdateVolumeUI();
+  }
+}
+
+// Mood history log
+const _moodLog = [];
+function logMoodEvent(emoji, text) {
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  _moodLog.unshift({ time, emoji, text });
+  if (_moodLog.length > 20) _moodLog.pop();
+  const log = document.getElementById('cat-mood-log');
+  if (!log) return;
+  log.innerHTML = _moodLog.map(e =>
+    `<div class="cat-mood-entry"><span class="cme-time">${e.time}</span>${e.emoji} ${e.text}</div>`
+  ).join('');
+}
+
+// Hook useItem to log mood events
+const _origUseItemForLog = window.useItem;
+window.useItem = function(itemId) {
+  const labels = { fish:'Fed fish 🐟', treats:'Gave treats 🍪', milk:'Served milk 🥛', bed:'Tucked in 🛏️', brush:'Brushed ✨', catnip:'Catnip party 🌿', collar:'New collar 🎀', mouse:'Played mouse 🐭' };
+  logMoodEvent('🐱', labels[itemId] || 'Used ' + itemId);
+  if (typeof _origUseItemForLog === 'function') _origUseItemForLog(itemId);
+};
+
+// ══════ HUD BAR % UPDATES ══════
+function updateHudBarPct() {
+  const foodFill = document.getElementById('hud-food-fill');
+  const happyFill = document.getElementById('hud-happy-fill');
+  const foodPct = document.getElementById('hud-food-pct');
+  const happyPct = document.getElementById('hud-happy-pct');
+  if (foodFill && foodPct) {
+    const fw = parseFloat(foodFill.style.width) || 0;
+    foodPct.textContent = Math.round(fw) + '%';
+  }
+  if (happyFill && happyPct) {
+    const hw = parseFloat(happyFill.style.width) || 0;
+    happyPct.textContent = Math.round(hw) + '%';
+  }
+}
+// Poll for bar changes
+setInterval(updateHudBarPct, 1000);
+
+function speakResult(data) {
+  if (!window.speechSynthesis) return;
+  const summary = data.plan_summary || (data.results || []).map(r => r.message).join('. ') || 'Done!';
+  const text = summary.substring(0, 200);
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.9; u.pitch = 1.1;
+  const voices = speechSynthesis.getVoices();
+  const femVoice = voices.find(v => v.name.includes('Samantha') || v.name.includes('Google UK English Female') || v.name.includes('Female'));
+  if (femVoice) u.voice = femVoice;
+  speechSynthesis.speak(u);
+}
+
+// ══════ F2: WAR ROOM ANIMATION ══════
+let _missionCount = parseInt(localStorage.getItem('nexus_missions') || '0');
+document.getElementById('warroom-missions').textContent = _missionCount;
+
+function setAgentStatus(agent, status, lastAction) {
+  const el = document.getElementById('awr-status-' + agent);
+  const lastEl = document.getElementById('awr-last-' + agent);
+  const tokEl = document.getElementById('awr-tokens-' + agent);
+  const timeEl = document.getElementById('awr-time-' + agent);
+  if (el) { el.className = 'awr-status ' + status; el.textContent = status.toUpperCase(); }
+  if (lastEl && lastAction) lastEl.textContent = lastAction;
+  if (tokEl && status === 'done') tokEl.textContent = 50 + Math.floor(Math.random() * 150);
+  if (timeEl && status === 'done') timeEl.textContent = (200 + Math.floor(Math.random() * 800)) + 'ms';
+}
+
+function animateWarRoom(query) {
+  const q = query.toLowerCase();
+  setAgentStatus('orchestrator', 'thinking', 'Analyzing: "' + query.substring(0, 30) + '"');
+  const agents = [];
+  if (q.includes('task') || q.includes('create') || q.includes('pending') || q.includes('done')) agents.push('task');
+  if (q.includes('event') || q.includes('schedule') || q.includes('meeting') || q.includes('calendar')) agents.push('calendar');
+  if (q.includes('note') || q.includes('save') || q.includes('write')) agents.push('notes');
+  if (!agents.length) agents.push('task', 'calendar', 'notes');
+
+  setTimeout(() => {
+    setAgentStatus('orchestrator', 'working', 'Dispatching to ' + agents.length + ' agent(s)');
+    agents.forEach((a, i) => {
+      setTimeout(() => setAgentStatus(a, 'working', 'Processing...'), (i + 1) * 400);
+    });
+  }, 600);
+}
+
+function completeWarRoom(data) {
+  const results = data.results || [];
+  setTimeout(() => {
+    setAgentStatus('orchestrator', 'done', 'Completed ' + results.length + ' step(s)');
+    results.forEach(r => {
+      const agent = r.agent?.toLowerCase().replace('agent', '') || '';
+      if (agent.includes('task')) setAgentStatus('task', 'done', r.action || 'Done');
+      if (agent.includes('calendar')) setAgentStatus('calendar', 'done', r.action || 'Done');
+      if (agent.includes('notes')) setAgentStatus('notes', 'done', r.action || 'Done');
+    });
+  }, 300);
+}
+
+function incrementMissions() {
+  _missionCount++;
+  localStorage.setItem('nexus_missions', _missionCount);
+  document.getElementById('warroom-missions').textContent = _missionCount;
+}
+
+// ══════ F3: CTRL+K COMMAND PALETTE ══════
+let _cmdOpen = false;
+
+document.addEventListener('keydown', (e) => {
+  // Command Palette
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleCommandPalette(); return; }
+  // Tab shortcuts
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 't') { e.preventDefault(); setTab('tasks'); }
+    if (e.key === 'e') { e.preventDefault(); setTab('calendar'); }
+    if (e.key === 'n') { e.preventDefault(); setTab('notes'); }
+    if (e.key === 'l') { e.preventDefault(); setTab('logs'); }
+  }
+  if (e.key === 'Escape') { closeCommandPalette(); closeShortcuts(); }
+});
+
+function toggleCommandPalette() {
+  if (_cmdOpen) { closeCommandPalette(); return; }
+  _cmdOpen = true;
+  const overlay = document.createElement('div');
+  overlay.className = 'cmd-overlay';
+  overlay.id = 'cmd-overlay';
+  overlay.onclick = (e) => { if (e.target === overlay) closeCommandPalette(); };
+  overlay.innerHTML = `
+    <div class="cmd-card">
+      <input class="cmd-input" id="cmd-input" placeholder="Ask Neko anything... 🐾" autofocus>
+      <div class="cmd-suggestions" id="cmd-suggestions"></div>
+      <div class="cmd-hint">ESC to close · ⌘K to toggle</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('cmd-input')?.focus(), 50);
+  document.getElementById('cmd-input').addEventListener('input', updateCmdSuggestions);
+}
+
+function updateCmdSuggestions() {
+  const val = document.getElementById('cmd-input')?.value.trim() || '';
+  const sg = document.getElementById('cmd-suggestions');
+  if (!sg) return;
+  if (!val) { sg.innerHTML = ''; return; }
+  sg.innerHTML = [
+    { prefix: '+ Task', label: 'Create task: ' + val, action: 'Create a task: ' + val },
+    { prefix: '+ Event', label: 'Schedule event: ' + val, action: 'Schedule an event: ' + val },
+    { prefix: '+ Note', label: 'Save note: ' + val, action: 'Save a note: ' + val },
+    { prefix: '⚡ Ask', label: 'Ask agents: ' + val, action: val },
+  ].map(s => `<div class="cmd-item" onclick="executeCmdAction('${s.action.replace(/'/g, "\\'")}')"><span class="cmd-prefix">${s.prefix}</span>${s.label}</div>`).join('');
+}
+
+function executeCmdAction(action) {
+  closeCommandPalette();
+  document.getElementById('query-input').value = action;
+  runQuery();
+}
+
+function closeCommandPalette() {
+  _cmdOpen = false;
+  document.getElementById('cmd-overlay')?.remove();
+}
+
+// ══════ F6: EXPLAIN WORKFLOW ══════
+async function explainWorkflow() {
+  const area = document.getElementById('explain-area');
+  if (!area) return;
+  const data = window._lastQueryResult;
+  if (!data) { area.innerHTML = '<div class="explain-card">No workflow to explain yet.</div>'; return; }
+
+  if (_noAPI() || !_aiReady) {
+    const steps = (data.results || []).map(r => r.agent + ': ' + r.action).join(', ');
+    area.innerHTML = `<div class="explain-card">🐱 Neko did ${data.steps_executed || 0} step(s): ${steps || 'workflow complete'}. Purrfect execution, no cat-astrophes! Using Google Cloud AI for the heavy lifting.</div>`;
+    if (typeof showPixelBubble === 'function') showPixelBubble('Let me explain nya~', 3000);
+    return;
+  }
+
+  area.innerHTML = '<div class="explain-card"><span class="spinner"></span> Neko is thinking...</div>';
+  try {
+    const prompt = "In 3 simple sentences, explain what just happened in the previous workflow as Neko the cat. Mention which Google Cloud service was used. Use one cat pun. Result: " + JSON.stringify(data.results?.map(r => r.agent + ':' + r.action));
+    const res = await fetch(API + '/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: prompt }) });
+    const d = await res.json();
+    const explanation = d.plan_summary || (d.results || []).map(r => r.message).join(' ') || 'Purrfect execution!';
+    area.innerHTML = `<div class="explain-card">🐱 ${explanation}</div>`;
+    if (typeof showPixelBubble === 'function') showPixelBubble(explanation.split('.')[0], 4000);
+  } catch {
+    area.innerHTML = '<div class="explain-card">🐱 Could not generate explanation. But trust me, it was purrfect!</div>';
+  }
+}
+
+// ══════ F7: IMPACT STATS BAR ══════
+function updateImpactBar(tc, ec, nc) {
+  const total = tc + ec + nc;
+  const hrs = (total * 0.2).toFixed(1);
+  let agents = 0;
+  try { const logs = window._nekoTaskCache || []; agents = 4; } catch { agents = 4; }
+  if (_backendOnline) {
+    fetch(API + '/logs').then(r => r.json()).then(d => {
+      const logs = d.logs || [];
+      const unique = new Set(logs.map(l => l.agent));
+      document.getElementById('impact-agents').textContent = Math.max(unique.size, 1);
+    }).catch(() => {});
+  }
+  document.getElementById('impact-hrs').textContent = hrs;
+  document.getElementById('impact-actions').textContent = total;
+  if (!_backendOnline) document.getElementById('impact-agents').textContent = agents;
+}
+
+// ══════ F8: DARK MODE SUNGLASSES ══════
+const _origToggleTheme = window.toggleTheme;
+window.toggleTheme = function() {
+  // Call the original toggleTheme from neko.js
+  if (typeof _origToggleTheme === 'function') _origToggleTheme();
+
+  // After the transition, add/remove sunglasses
+  setTimeout(() => {
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') {
+      if (typeof nekoWearSunglasses === 'function') nekoWearSunglasses(true);
+      if (typeof showPixelBubble === 'function') showPixelBubble('Too cool for light mode 😎', 3000);
+    } else {
+      if (typeof nekoWearSunglasses === 'function') nekoWearSunglasses(false);
+      if (typeof showPixelBubble === 'function') showPixelBubble('Bright! Nya~ ☀️', 3000);
+    }
+  }, 300);
+};
+
+// ══════ F9: NEKO ONBOARDING TOUR ══════
+function startNekoTour() {
+  if (!nekoPet) return;
+  localStorage.removeItem('nexus_toured');
+  const navItems = document.querySelectorAll('.nav-item');
+  const messages = [
+    'Boss me around here nya~ 🐾',
+    'Your chaos lives here 📋',
+    'Time is fake but I track it 📅',
+    'Brain dumps welcome 📝',
+    'Watch activity in real time 📊',
+    'Watch us work in real time ⚡',
+    'My 14 superpowers 🔧',
+  ];
+
+  let step = 0;
+  function tourStep() {
+    if (step >= navItems.length || step >= messages.length) {
+      navItems.forEach(n => n.classList.remove('tour-highlight'));
+      nekoPet.resume();
+      if (typeof showPixelBubble === 'function') showPixelBubble("Let's go! Type anything up there 🐱", 4000);
+      localStorage.setItem('nexus_toured', 'true');
+      return;
+    }
+    navItems.forEach(n => n.classList.remove('tour-highlight'));
+    const target = navItems[step];
+    target.classList.add('tour-highlight');
+    const rect = target.getBoundingClientRect();
+    nekoPet.x = rect.left + rect.width + 20;
+    nekoPet.y = rect.top - 20;
+    nekoPet.x = Math.max(0, Math.min(window.innerWidth - 96, nekoPet.x));
+    nekoPet.y = Math.max(0, Math.min(window.innerHeight - 96, nekoPet.y));
+    nekoPet._updatePosition();
+    if (typeof showPixelBubble === 'function') showPixelBubble(messages[step], 2200);
+    step++;
+    setTimeout(tourStep, 2500);
+  }
+
+  nekoPet.pause();
+  tourStep();
+}
+
+// Auto-start tour for first-time users
+setTimeout(() => {
+  if (!localStorage.getItem('nexus_toured') && document.getElementById('main-layout')?.style.display !== 'none') {
+    startNekoTour();
+  }
+}, 2000);
+
+// Watch for layout becoming visible to start tour
+const _tourObserver = new MutationObserver(() => {
+  const layout = document.getElementById('main-layout');
+  if (layout && layout.style.display !== 'none' && !localStorage.getItem('nexus_toured')) {
+    setTimeout(startNekoTour, 1500);
+    _tourObserver.disconnect();
+  }
+});
+_tourObserver.observe(document.getElementById('main-layout') || document.body, { attributes: true, attributeFilter: ['style'] });
+
+// ══════ F10: KEYBOARD SHORTCUTS POPUP ══════
+function toggleShortcuts() {
+  const popup = document.getElementById('shortcuts-popup');
+  popup.classList.toggle('open');
+}
+function closeShortcuts() {
+  document.getElementById('shortcuts-popup')?.classList.remove('open');
+}
+
+// ══════ F4: ENHANCED INVENTORY MILK GROW ══════
+// Override milk behavior in neko.js useItem
+const _origUseItem = window.useItem;
+window.useItem = function(itemId) {
+  if (itemId === 'milk') {
+    // Milk = grow 20% bigger for 5 seconds
+    if (typeof _origUseItem === 'function') _origUseItem(itemId);
+    const petEl = document.getElementById('neko-pet');
+    if (petEl) {
+      petEl.classList.add('milk-grow');
+      if (typeof showPixelBubble === 'function') showPixelBubble('Calcium nya~ 🥛', 3000);
+      setTimeout(() => petEl.classList.remove('milk-grow'), 5000);
+    }
+    return;
+  }
+  if (itemId === 'bed') {
+    if (typeof _origUseItem === 'function') _origUseItem(itemId);
+    // Add focus badge
+    if (!document.getElementById('focus-badge-el')) {
+      const badge = document.createElement('div');
+      badge.className = 'focus-badge';
+      badge.id = 'focus-badge-el';
+      badge.textContent = '🌙 FOCUS MODE';
+      document.body.appendChild(badge);
+      setTimeout(() => { const b = document.getElementById('focus-badge-el'); if (b) b.remove(); }, 30 * 60 * 1000);
+    }
+    return;
+  }
+  if (itemId === 'treats') {
+    if (typeof _origUseItem === 'function') _origUseItem(itemId);
+    // Show extended stats popup with localStorage streak
+    const tasks = window._nekoTaskCache || [];
+    const completed = tasks.filter(t => t.status === 'completed').length;
+    const total = tasks.length;
+    const today = new Date().toISOString().substring(0, 10);
+    let streak = parseInt(localStorage.getItem('nexus_streak') || '0');
+    const lastDate = localStorage.getItem('nexus_streak_date') || '';
+    if (lastDate === today) { /* same day */ }
+    else if (completed > 0) { streak++; localStorage.setItem('nexus_streak', streak); localStorage.setItem('nexus_streak_date', today); }
+    if (typeof showPixelBubble === 'function') showPixelBubble(`🔥 Streak: ${streak} days · ${completed}/${total} done`, 5000);
+    return;
+  }
+  if (typeof _origUseItem === 'function') _origUseItem(itemId);
+};
+
+// Hide mic button if speech not supported (was set in initVoice)
+
+// ══════════════════════════════════════════════════
+// ── CAT TOWER FEATURE ──
+// ══════════════════════════════════════════════════
+
+const TOWER_VARIANTS = [
+  { name:'Cream',  post:'#a08878', postDk:'#887060', shelf:'#FFD5E9', shelfDk:'#d8a8c0', frame:'#e8e0d8', frameDk:'#d0c8c0', base:'#d8d0c8', baseDk:'#c0b8b0', accent:'#D6BDE4' },
+  { name:'Dark',   post:'#505060', postDk:'#404050', shelf:'#7860a0', shelfDk:'#604880', frame:'#484858', frameDk:'#383848', base:'#404050', baseDk:'#303040', accent:'#98A4D8' },
+  { name:'Mint',   post:'#78a078', postDk:'#608860', shelf:'#a8d8b0', shelfDk:'#88b890', frame:'#b8d8c0', frameDk:'#98b8a0', base:'#98c8a0', baseDk:'#80b088', accent:'#88d8a0' },
+];
+
+let _towerVariant = parseInt(localStorage.getItem('nexus_tower_color') || '0') % TOWER_VARIANTS.length;
+let _nekoIsHome = false;
+let _towerIdleTimer = null;
+const TOWER_IDLE_SECONDS = 45;
+
+function drawTower() {
+  const canvas = document.getElementById('tower-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 50, H = 82;
+  ctx.clearRect(0, 0, W, H);
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const v = TOWER_VARIANTS[_towerVariant];
+  const post   = isDark ? v.postDk   : v.post;
+  const shelf  = isDark ? v.shelfDk  : v.shelf;
+  const frame  = isDark ? v.frameDk  : v.frame;
+  const base   = isDark ? v.baseDk   : v.base;
+  const accent = v.accent;
+  const borderC = isDark ? '#2a2a3a' : '#706860';
+
+  const rect = (x, y, w, h, color) => { ctx.fillStyle = color; ctx.fillRect(x, y, w, h); };
+  const pxBorder = (x, y, w, h, color, thick=1) => {
+    ctx.strokeStyle = color; ctx.lineWidth = thick;
+    ctx.strokeRect(x+0.5, y+0.5, w-1, h-1);
+  };
+
+  // ── BASE PLATFORM ──
+  rect(6, 68, 38, 12, base);
+  pxBorder(6, 68, 38, 12, borderC);
+
+  // ── CENTER POST ──
+  rect(22, 22, 6, 46, post);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  for (let y = 24; y < 66; y += 3) { ctx.fillRect(22, y, 6, 1); }
+
+  // ── MIDDLE SHELF ──
+  rect(14, 46, 22, 7, shelf);
+  pxBorder(14, 46, 22, 7, borderC);
+
+  // ── TOP PLATFORM — enlarged sleeping box frame ──
+  rect(9, 2, 32, 26, frame);
+  pxBorder(9, 2, 32, 26, borderC);
+
+  // ── BED CUSHION (28×22 — fits 32×32 sprite at display scale) ──
+  rect(11, 4, 28, 22, shelf);
+  pxBorder(11, 4, 28, 22, borderC);
+
+  // ── ENTRY HOLE at bottom of box (16×12) ──
+  const holeColor = isDark ? '#1a1a28' : '#504840';
+  rect(17, 14, 16, 12, holeColor);
+  pxBorder(17, 14, 16, 12, borderC);
+
+  // ── Cat face on cushion (above hole) ──
+  const fur = isDark ? '#b8b0c8' : '#e8e0d8';
+  rect(19, 5, 12, 8, fur);          // Head
+  rect(19, 3, 3, 3, fur);           // Left ear
+  rect(28, 3, 3, 3, fur);           // Right ear
+  rect(20, 4, 1, 1, '#e8a0b0');     // Left ear inner
+  rect(29, 4, 1, 1, '#e8a0b0');     // Right ear inner
+  rect(22, 8, 2, 2, '#2a2020');     // Left eye outline
+  rect(27, 8, 2, 2, '#2a2020');     // Right eye outline
+  rect(22, 8, 1, 1, '#48c8a0');     // Left iris
+  rect(28, 8, 1, 1, '#48a0c8');     // Right iris
+  rect(24, 11, 2, 1, '#e8a0b0');    // Nose
+
+  // ── Corner accents ──
+  rect(10, 3, 3, 3, accent);
+  rect(37, 3, 3, 3, accent);
+
+  // ── Post supports at base ──
+  rect(16, 75, 5, 5, post);
+  rect(30, 75, 5, 5, post);
+
+  // ── Neko-at-home indicator ──
+  if (_nekoIsHome) {
+    ctx.save();
+    ctx.globalAlpha = 0.3 + 0.15 * Math.sin(Date.now() * 0.003);
+    ctx.fillStyle = accent;
+    ctx.fillRect(9, 2, 32, 26);
+    ctx.restore();
+    ctx.save();
+    ctx.font = '7px serif';
+    ctx.fillStyle = accent;
+    ctx.globalAlpha = 0.5 + 0.3 * Math.sin(Date.now() * 0.002);
+    ctx.fillText('z', 38, 6);
+    ctx.fillText('Z', 42, 2);
+    ctx.restore();
+  }
+
+  // ── Animated sparkles (canvas-drawn) ──
+  if (_towerSparkleList.length > 0) {
+    const now = Date.now();
+    _towerSparkleList = _towerSparkleList.filter(sp => {
+      const age = now - sp.birth;
+      if (age > 2000) return false;
+      ctx.save();
+      ctx.fillStyle = '#ffcd75';
+      ctx.globalAlpha = 1 - age / 2000;
+      ctx.fillRect(sp.x, sp.y - (age / 2000) * 10, 2, 2);
+      ctx.restore();
+      return true;
+    });
+  }
+}
+
+// Animate tower continuously for the glow effect when neko is home
+let _towerAnimFrame = null;
+function towerRenderLoop() {
+  drawTower();
+  _towerAnimFrame = requestAnimationFrame(towerRenderLoop);
+}
+
+// ── MOOD DOT ──
+function updateTowerMoodDot() {
+  const dot = document.getElementById('tower-mood-dot');
+  if (!dot) return;
+  dot.classList.remove('mood-happy', 'mood-ok', 'mood-sad', 'mood-sleep');
+  if (_nekoTowerStage === 2) { dot.classList.add('mood-sleep'); return; }
+  if (catHappiness > 70) dot.classList.add('mood-happy');
+  else if (catHappiness >= 30) dot.classList.add('mood-ok');
+  else dot.classList.add('mood-sad');
+}
+
+// ── SPARKLE ON FEED (5 sparkles in star pattern, 2×2 canvas units) ──
+let _towerSparkleList = [];
+function towerSparkle() {
+  const positions = [
+    [25, -1], [17, 1], [33, 1], [20, 4], [30, 4]
+  ];
+  const now = Date.now();
+  positions.forEach(([x, y]) => {
+    _towerSparkleList.push({ x, y, birth: now });
+  });
+}
+
+// ── CYCLE TOWER VARIANT ──
+function cycleTower(dir) {
+  _towerVariant = (_towerVariant + dir + TOWER_VARIANTS.length) % TOWER_VARIANTS.length;
+  localStorage.setItem('nexus_tower_color', _towerVariant);
+  drawTower();
+}
+window.cycleTower = cycleTower;
+
+// ── MULTI-STAGE TOWER IDLE SYSTEM ──
+// Stage 0 = free roaming, 1 = sitting on platform, 2 = sleeping in box
+let _nekoTowerStage = 0;
+let _nekoStageTimer = null;
+let _nekoLerpFrame = null;
+let _zzzInterval = null;
+
+// Smooth lerp movement toward a target
+function lerpNekoToTarget(targetX, targetY, onArrive) {
+  if (_nekoLerpFrame) cancelAnimationFrame(_nekoLerpFrame);
+  function step() {
+    if (!nekoPet) return;
+    nekoPet.x += (targetX - nekoPet.x) * 0.08;
+    nekoPet.y += (targetY - nekoPet.y) * 0.08;
+    nekoPet._updatePosition();
+    const dist = Math.hypot(nekoPet.x - targetX, nekoPet.y - targetY);
+    if (dist < 4) {
+      nekoPet.x = targetX;
+      nekoPet.y = targetY;
+      nekoPet._updatePosition();
+      _nekoLerpFrame = null;
+      if (onArrive) onArrive();
+    } else {
+      _nekoLerpFrame = requestAnimationFrame(step);
+    }
+  }
+  _nekoLerpFrame = requestAnimationFrame(step);
+}
+
+// STAGE 1 — Neko sits on the middle platform (45s idle)
+function nekoSitOnPlatform() {
+  if (!nekoPet || nekoPet.dragging) return;
+  const tower = document.getElementById('cat-tower-home');
+  if (!tower) return;
+  const tRect = tower.getBoundingClientRect();
+  const targetX = tRect.left + tRect.width / 2 - 16;
+  const targetY = tRect.top + tRect.height * 0.52;
+
+  _nekoTowerStage = 1;
+  nekoPet.paused = false;
+  nekoPet.state = 'walking';
+  if (typeof setCatState === 'function') setCatState('walking');
+
+  lerpNekoToTarget(targetX, targetY, () => {
+    nekoPet.paused = true;
+    nekoPet.state = 'idle';
+    if (typeof setCatState === 'function') setCatState('idle');
+    showPixelBubble('Taking a nap nya~ 😴', 3000);
+    // After 30 more seconds → enter sleep box
+    _nekoStageTimer = setTimeout(nekoEnterSleepBox, 30000);
+  });
+}
+
+// STAGE 2 — Neko enters the top sleeping box (75s total idle)
+function nekoEnterSleepBox() {
+  if (!nekoPet || _nekoTowerStage !== 1) return;
+  const tower = document.getElementById('cat-tower-home');
+  if (!tower) return;
+  const tRect = tower.getBoundingClientRect();
+  const targetX = tRect.left + tRect.width / 2 - 16;
+  const targetY = tRect.top + 8;
+
+  _nekoTowerStage = 2;
+  _nekoIsHome = true;
+  tower.classList.add('neko-home');
+
+  lerpNekoToTarget(targetX, targetY, () => {
+    nekoPet.paused = true;
+    nekoPet.state = 'sleeping';
+    nekoPet.el.classList.add('neko-sleeping-home', 'neko-on-tower');
+    if (typeof setCatState === 'function') setCatState('sleeping');
+    updateTowerMoodDot();
+    startZzzCycle();
+    drawTower();
+  });
+}
+
+// Zzz cycling via speech bubble
+function startZzzCycle() {
+  const msgs = ['z', 'zz', 'Zzz'];
+  let idx = 0;
+  clearInterval(_zzzInterval);
+  _zzzInterval = setInterval(() => {
+    if (_nekoTowerStage !== 2) { clearInterval(_zzzInterval); return; }
+    showPixelBubble(msgs[idx % msgs.length], 1400);
+    idx++;
+  }, 1500);
+}
+
+// WAKE UP — triggered by tower click when neko is on tower
+function wakeNekoFromTower() {
+  if (_nekoTowerStage === 0) return false;
+
+  // Cancel lerp / timers
+  if (_nekoLerpFrame) { cancelAnimationFrame(_nekoLerpFrame); _nekoLerpFrame = null; }
+  clearTimeout(_nekoStageTimer);
+  clearInterval(_zzzInterval);
+
+  // Restore Neko appearance
+  if (nekoPet && nekoPet.el) {
+    nekoPet.el.classList.remove('neko-sleeping-home', 'neko-on-tower');
+  }
+
+  // Reset tower state
+  const wasSleeping = _nekoTowerStage === 2;
+  _nekoIsHome = false;
+  _nekoTowerStage = 0;
+  const tower = document.getElementById('cat-tower-home');
+  if (tower) tower.classList.remove('neko-home');
+  updateTowerMoodDot();
+  drawTower();
+
+  // Surprised → happy → arc-jump
+  if (typeof setCatState === 'function') setCatState('boop');
+  showPixelBubble("Nya?! You woke me up! 👁️", 2000);
+
+  setTimeout(() => {
+    if (!nekoPet) return;
+    if (typeof setCatState === 'function') setCatState('happy');
+    nekoPet.paused = false;
+    const startX = nekoPet.x, startY = nekoPet.y;
+    const endX = window.innerWidth - 150;
+    const endY = window.innerHeight - 150;
+    let progress = 0;
+    function jumpStep() {
+      progress += 0.03;
+      if (progress >= 1) {
+        nekoPet.x = endX; nekoPet.y = endY;
+        nekoPet._updatePosition();
+        nekoPet.state = 'idle'; nekoPet.idleTimer = 0;
+        if (typeof setCatState === 'function') setCatState('idle');
+        resetTowerIdleTimer();
+        return;
+      }
+      nekoPet.x = startX + (endX - startX) * progress;
+      nekoPet.y = startY + (endY - startY) * progress - 20 * Math.sin(progress * Math.PI);
+      nekoPet._updatePosition();
+      requestAnimationFrame(jumpStep);
+    }
+    requestAnimationFrame(jumpStep);
+  }, 500);
+
+  return true;
+}
+
+// ── CALL NEKO HOME (tower click handler) ──
+function callNekoHome() {
+  // Don't interrupt Pomodoro sleep (Fix 4/5)
+  if (typeof _nekoIsSleeping !== 'undefined' && _nekoIsSleeping) return;
+  // If Neko is on tower, wake up instead
+  if (_nekoTowerStage > 0) { wakeNekoFromTower(); return; }
+  // Otherwise, bring Neko to the platform (stage 1 shortcut)
+  nekoSitOnPlatform();
+}
+window.callNekoHome = callNekoHome;
+
+// ── IDLE RETURN HOME (45s) ──
+function resetTowerIdleTimer() {
+  _nekoIsHome = false;
+  _nekoTowerStage = 0;
+  const tower = document.getElementById('cat-tower-home');
+  if (tower) tower.classList.remove('neko-home');
+  clearTimeout(_towerIdleTimer);
+  _towerIdleTimer = setTimeout(() => {
+    if (nekoPet && !nekoPet.dragging && !nekoPet.paused) {
+      nekoSitOnPlatform();
+    }
+  }, TOWER_IDLE_SECONDS * 1000);
+}
+
+// Fully cancel tower state and reset Neko
+function fullTowerReset() {
+  if (_nekoLerpFrame) { cancelAnimationFrame(_nekoLerpFrame); _nekoLerpFrame = null; }
+  clearTimeout(_nekoStageTimer);
+  clearInterval(_zzzInterval);
+  if (nekoPet && nekoPet.el) {
+    nekoPet.el.classList.remove('neko-sleeping-home', 'neko-on-tower');
+  }
+  _nekoIsHome = false;
+  const prevStage = _nekoTowerStage;
+  _nekoTowerStage = 0;
+  const tower = document.getElementById('cat-tower-home');
+  if (tower) tower.classList.remove('neko-home');
+  updateTowerMoodDot();
+  drawTower();
+  return prevStage;
+}
+
+// Hook into user interactions to reset the idle timer
+['click','keydown','mousemove','touchstart'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    // Don't auto-wake if Neko is in Pomodoro sleep (Fix 4/5)
+    if (typeof _nekoIsSleeping !== 'undefined' && _nekoIsSleeping) return;
+    if (_nekoTowerStage > 0 && nekoPet) {
+      const wasStage = fullTowerReset();
+      nekoPet.paused = false;
+      nekoPet.state = 'idle';
+      nekoPet.idleTimer = 0;
+      if (typeof setCatState === 'function') setCatState('idle');
+      if (wasStage === 2) {
+        showPixelBubble('*yawns* I\'m up!', 2000);
+      }
+    }
+    resetTowerIdleTimer();
+  }, { passive: true });
+});
+
+// ── HOOK INTO useItem FOR SPARKLE ──
+const _towerOrigUseItem = window.useItem;
+window.useItem = function(itemId) {
+  if (itemId === 'fish' || itemId === 'treats') {
+    towerSparkle();
+    updateTowerMoodDot();
+  }
+  if (typeof _towerOrigUseItem === 'function') _towerOrigUseItem(itemId);
+};
+
+// ── HOOK INTO HUD BAR UPDATES FOR MOOD DOT ──
+const _origUpdateBars = window.updateNekoHUD;
+window.updateNekoHUD = function() {
+  if (typeof _origUpdateBars === 'function') _origUpdateBars();
+  updateTowerMoodDot();
+};
+
+// ── THEME CHANGE → REDRAW TOWER ──
+const _towerObserver = new MutationObserver(() => drawTower());
+_towerObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+// ── INIT ──
+function initCatTower() {
+  drawTower();
+  updateTowerMoodDot();
+  resetTowerIdleTimer();
+  towerRenderLoop();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCatTower);
+} else {
+  setTimeout(initCatTower, 200);
+}
+// ══════════════════════════════════════════════════
+// ── FIX 4+5: NEKO SLEEP + POMODORO TIMER ──
+// ══════════════════════════════════════════════════
+let _pomodoroInterval = null;
+let _pomodoroRemaining = 25 * 60; // 25 minutes default
+let _pomodoroPaused = false;
+let _nekoIsSleeping = false;
+
+function nekoSleepAction() {
+  if (_nekoIsSleeping) return; // already sleeping
+  _nekoIsSleeping = true;
+
+  // Update button state
+  const sleepBtn = document.getElementById('neko-sleep-btn');
+  if (sleepBtn) { sleepBtn.disabled = true; sleepBtn.textContent = '😴 SLEEPING...'; }
+
+  // Cancel any existing tower timers
+  if (_nekoLerpFrame) { cancelAnimationFrame(_nekoLerpFrame); _nekoLerpFrame = null; }
+  clearTimeout(_nekoStageTimer);
+  clearTimeout(_towerIdleTimer);
+  clearInterval(_zzzInterval);
+
+  // Move Neko directly to the tower sleep box (skip stage 1)
+  const tower = document.getElementById('cat-tower-home');
+  if (!tower || !nekoPet) {
+    _nekoIsSleeping = false;
+    if (sleepBtn) { sleepBtn.disabled = false; sleepBtn.textContent = '💤 SLEEP'; }
+    return;
+  }
+
+  const tRect = tower.getBoundingClientRect();
+  const targetX = tRect.left + tRect.width / 2 - 16;
+  const targetY = tRect.top + 8;
+
+  _nekoTowerStage = 2;
+  _nekoIsHome = true;
+  tower.classList.add('neko-home');
+  nekoPet.paused = true;
+
+  if (typeof setCatState === 'function') setCatState('walking');
+  showPixelBubble('Sleepy time... 💤', 2000);
+
+  lerpNekoToTarget(targetX, targetY, () => {
+    nekoPet.paused = true;
+    nekoPet.state = 'sleeping';
+    nekoPet.el.classList.add('neko-sleeping-home', 'neko-on-tower');
+    if (typeof setCatState === 'function') setCatState('sleeping');
+    updateTowerMoodDot();
+    startZzzCycle();
+    drawTower();
+  });
+
+  // Start Pomodoro (Fix 5)
+  startPomodoro();
+}
+
+function startPomodoro(duration) {
+  _pomodoroRemaining = duration || 25 * 60;
+  _pomodoroPaused = false;
+
+  const container = document.getElementById('pomodoro-container');
+  const pauseBtn = document.getElementById('pomodoro-pause-btn');
+  if (container) container.style.display = 'block';
+  if (pauseBtn) pauseBtn.textContent = '⏸ PAUSE';
+
+  updatePomodoroDisplay();
+
+  clearInterval(_pomodoroInterval);
+  _pomodoroInterval = setInterval(() => {
+    if (_pomodoroPaused) return;
+    _pomodoroRemaining--;
+    updatePomodoroDisplay();
+
+    if (_pomodoroRemaining <= 0) {
+      pomodoroComplete();
+    }
+  }, 1000);
+}
+
+function updatePomodoroDisplay() {
+  const timerEl = document.getElementById('pomodoro-timer');
+  if (!timerEl) return;
+  const m = Math.floor(Math.max(0, _pomodoroRemaining) / 60);
+  const s = Math.max(0, _pomodoroRemaining) % 60;
+  timerEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function pausePomodoro() {
+  _pomodoroPaused = !_pomodoroPaused;
+  const pauseBtn = document.getElementById('pomodoro-pause-btn');
+  if (pauseBtn) {
+    pauseBtn.textContent = _pomodoroPaused ? '▶ RESUME' : '⏸ PAUSE';
+  }
+}
+
+function stopPomodoro() {
+  clearInterval(_pomodoroInterval);
+  _pomodoroInterval = null;
+  _pomodoroRemaining = 25 * 60;
+  _pomodoroPaused = false;
+
+  const container = document.getElementById('pomodoro-container');
+  if (container) container.style.display = 'none';
+
+  // Wake Neko
+  wakeNekoFromSleep();
+}
+
+function pomodoroComplete() {
+  clearInterval(_pomodoroInterval);
+  _pomodoroInterval = null;
+
+  const container = document.getElementById('pomodoro-container');
+  if (container) container.style.display = 'none';
+
+  // Play meow sound (silent-fail)
+  try {
+    if (typeof SoundEngine !== 'undefined' && SoundEngine.playMeow) {
+      SoundEngine.playMeow();
+    }
+  } catch(e) {}
+
+  // Show notification
+  showPixelBubble('BREAK TIME! 🐱', 5000);
+
+  // Wake Neko
+  wakeNekoFromSleep();
+}
+
+function wakeNekoFromSleep() {
+  _nekoIsSleeping = false;
+
+  // Restore sleep button
+  const sleepBtn = document.getElementById('neko-sleep-btn');
+  if (sleepBtn) { sleepBtn.disabled = false; sleepBtn.textContent = '💤 SLEEP'; }
+
+  // Use existing tower wake logic
+  wakeNekoFromTower();
+
+  // Reset idle timer
+  resetTowerIdleTimer();
+}
+window.nekoSleepAction = nekoSleepAction;
+window.pausePomodoro = pausePomodoro;
+window.stopPomodoro = stopPomodoro;
+
+// ══════════════════════════════════════════════════
+// ── SOUND ENGINE ──
+// ══════════════════════════════════════════════════
+const SoundEngine = {
+  muted: false,
+  ready: false,
+  popSound: null,
+  ladderSound: null,
+  ladderCooldown: false,
+  // ── New cat sounds ──
+  nekoMeow: null,
+  nekoPurr: null,
+  nekoHowl: null,
+  howlPlayed: false,    // prevents continuous howl repeats
+  _howlTimeout: null,   // tracks howl → resume purr delay
+
+  init() {
+    if (this.ready) return;
+    this.ready = true;
+    this.popSound = new Audio('assets/sounds/minecraft-pop.mp3');
+    this.popSound.volume = 0.6;
+    this.ladderSound = new Audio('assets/sounds/minecraft-ladder.wav');
+    this.ladderSound.volume = 0.3;
+
+    // ── neko-meow: single meow, replaces pop on Neko click ──
+    this.nekoMeow = new Audio('assets/sounds/neko-meow.mp3');
+    this.nekoMeow.volume = 0.7;
+
+    // ── neko-purr: loops while Neko is happy (happiness > 70%) ──
+    this.nekoPurr = new Audio('assets/sounds/neko-purr.wav');
+    this.nekoPurr.loop = true;
+    this.nekoPurr.volume = 0.15;
+
+    // ── neko-howl: plays ONCE when happiness drops below 30% ──
+    this.nekoHowl = new Audio('assets/sounds/neko-howl.wav');
+    this.nekoHowl.volume = 0.5;
+
+    // When howl ends, resume purr if still happy enough
+    this.nekoHowl.addEventListener('ended', () => {
+      if (!this.muted && typeof catHappiness !== 'undefined' && catHappiness > 70) {
+        this.nekoPurr.play().catch(() => {});
+      }
+    });
+
+    // Restore mute preference
+    this.muted = localStorage.getItem('nexus_muted') === 'true';
+    this._updateBtn();
+  },
+
+  // ── Play meow on Neko click (replaces minecraft-pop) ──
+  playMeow() {
+    if (this.muted || !this.nekoMeow) return;
+    this.nekoMeow.currentTime = 0;
+    this.nekoMeow.play().catch(() => {});
+  },
+
+  playPop() {
+    if (this.muted || !this.popSound) return;
+    this.popSound.currentTime = 0;
+    this.popSound.play().catch(() => {});
+  },
+
+  playLadder() {
+    if (this.muted || !this.ladderSound || this.ladderCooldown) return;
+    this.ladderSound.currentTime = 0;
+    this.ladderSound.play().catch(() => {});
+    this.ladderCooldown = true;
+    setTimeout(() => this.ladderCooldown = false, 80);
+  },
+
+  // ── Mood-linked purr: start/stop based on happiness ──
+  updateMoodSounds(happinessValue) {
+    if (!this.ready || this.muted) {
+      // If muted, ensure purr is stopped
+      if (this.nekoPurr && !this.nekoPurr.paused) {
+        this.nekoPurr.pause();
+        this.nekoPurr.currentTime = 0;
+      }
+      return;
+    }
+    if (happinessValue > 70) {
+      // Start purring if not already (and howl isn't playing)
+      if (this.nekoPurr && this.nekoPurr.paused && (this.nekoHowl && this.nekoHowl.paused)) {
+        this.nekoPurr.play().catch(() => {});
+      }
+    } else {
+      // Stop purring
+      if (this.nekoPurr && !this.nekoPurr.paused) {
+        this.nekoPurr.pause();
+        this.nekoPurr.currentTime = 0;
+      }
+    }
+  },
+
+  // ── Sad-state howl: plays ONCE when happiness < 30% ──
+  checkSadState(happinessValue) {
+    if (!this.ready || this.muted) return;
+    if (happinessValue < 30 && !this.howlPlayed) {
+      // PRIORITY: howl STOPS purring temporarily
+      if (this.nekoPurr && !this.nekoPurr.paused) {
+        this.nekoPurr.pause();
+        this.nekoPurr.currentTime = 0;
+      }
+      if (this.nekoHowl) {
+        this.nekoHowl.currentTime = 0;
+        this.nekoHowl.play().catch(() => {});
+      }
+      this.howlPlayed = true;
+    }
+    if (happinessValue >= 30) {
+      this.howlPlayed = false; // reset so it can trigger again
+    }
+  },
+
+  // ── Helper: get current happiness for unmute resume ──
+  _getCurrentHappiness() {
+    return typeof catHappiness !== 'undefined' ? catHappiness : 50;
+  },
+
+  toggleMute() {
+    this.muted = !this.muted;
+    localStorage.setItem('nexus_muted', this.muted);
+    this._updateBtn();
+
+    if (this.muted) {
+      // Pause all sounds when muting
+      [this.nekoMeow, this.nekoPurr, this.nekoHowl, this.ladderSound, this.popSound].forEach(s => {
+        if (s && !s.paused) s.pause();
+      });
+    } else {
+      // Resume purr if unmuting and Neko is happy
+      const currentHappiness = this._getCurrentHappiness();
+      if (currentHappiness > 70 && this.nekoPurr) {
+        this.nekoPurr.play().catch(() => {});
+      }
+      // Audible feedback on unmute
+      this.playMeow();
+    }
+  },
+
+  _updateBtn() {
+    const btn = document.getElementById('sound-mute-btn');
+    if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
+  }
+};
+window.SoundEngine = SoundEngine;
+
+// First-interaction gate (browser autoplay policy)
+document.addEventListener('click', () => SoundEngine.init(), { once: false });
+document.addEventListener('keydown', () => SoundEngine.init(), { once: false });
+
+// SOUND 1 — Meow on Neko click (REPLACES minecraft-pop)
+(function() {
+  const nekoCanvas = document.getElementById('neko-pet-canvas');
+  if (nekoCanvas) {
+    nekoCanvas.addEventListener('click', () => SoundEngine.playMeow());
+  }
+  // Also play meow on tower click
+  const tower = document.getElementById('cat-tower-home');
+  if (tower) {
+    tower.addEventListener('click', () => SoundEngine.playMeow());
+  }
+})();
+
+// SOUND 2 — Ladder on typing
+document.addEventListener('keydown', (e) => {
+  const active = document.activeElement;
+  const isTyping = active && (active.tagName === 'INPUT' ||
+                   active.tagName === 'TEXTAREA' ||
+                   active.isContentEditable);
+  const isRealKey = e.key.length === 1 ||
+                    e.key === 'Backspace' ||
+                    e.key === 'Enter';
+  if (isTyping && isRealKey) SoundEngine.playLadder();
+});
+</script>
+</body>
+</html>
