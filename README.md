@@ -47,7 +47,7 @@ pip install -r requirements.txt
 
 ### 2. Set your Google Gemini API key
 ```bash
-export GEMINI_API_KEY=your_key_here
+export GROQ_API_KEY=your_key_here
 ```
 
 ### 3. Start the API server
@@ -149,7 +149,7 @@ gcloud run deploy nexus-agents \
   --platform managed \
   --region asia-southeast1 \
   --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=your_key
+  --set-env-vars GROQ_API_KEY=your_key
 ```
 
 ---

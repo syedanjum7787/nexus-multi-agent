@@ -230,7 +230,7 @@ if __name__ == "__main__":
         print("  🔑 AI Engine:  Google Gemini 2.0 Flash ✓")
     else:
         print("  ⚠️  AI Engine:  NOT CONFIGURED")
-        print("     → Set: export GEMINI_API_KEY=your_key")
+        print("     → Set: export GROQ_API_KEY=your_key")
         print("     → Get a free key: https://aistudio.google.com/apikey")
         print("     → Tasks, Calendar, Notes & MCP Tools still work without AI")
     print()
